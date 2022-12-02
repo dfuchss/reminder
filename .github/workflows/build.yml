@@ -1,0 +1,33 @@
+name: Build Reminder
+
+on:
+  workflow_dispatch:
+  push:
+    # Publish `main` as Docker `latest` image.
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - '.github/**'
+
+    # Publish `v1.2.3` tags as releases.
+    tags:
+      - v*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: 
+      image: dock.mau.dev/maubot/maubot
+      env:
+        PYTHONPATH: /opt/maubot
+        
+
+    steps:
+    - uses: actions/checkout@v3
+    - run: python3 -m maubot.cli build -o reminder.mbp
+    - name: Save Reminder.mbp
+      uses: actions/upload-artifact@v3
+      with:
+        name: "reminder.mbp"
+        path: "reminder.mbp"
